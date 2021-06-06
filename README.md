@@ -1,4 +1,4 @@
-# PANDA
+# Mean-Shifted Contrastive Loss for Anomaly Detection
 Official PyTorch implementation of [**“Mean-Shifted Contrastive Loss for Anomaly Detection”**]().
 
 ## Virtual Environment
