@@ -1,5 +1,5 @@
 # Mean-Shifted Contrastive Loss for Anomaly Detection
-Official PyTorch implementation of [**“Mean-Shifted Contrastive Loss for Anomaly Detection”**]().
+Official PyTorch implementation of [**“Mean-Shifted Contrastive Loss for Anomaly Detection”**](https://arxiv.org/pdf/2106.03844.pdf).
 
 ## Virtual Environment
 Use the following commands:
@@ -22,4 +22,10 @@ To run experiments on different datasets, please set the path in utils.py to the
 ## Citation
 If you find this useful, please cite our paper:
 ```
+@article{reiss2021mean,
+  title={Mean-Shifted Contrastive Loss for Anomaly Detection},
+  author={Reiss, Tal and Hoshen, Yedid},
+  journal={arXiv preprint arXiv:2106.03844},
+  year={2021}
+}
 ```
