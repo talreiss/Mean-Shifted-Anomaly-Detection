@@ -17,6 +17,12 @@ python main.py --dataset=cifar10 --label=n
 ```
 Where n indicates the id of the normal class.
 
+To replicate the results on CIFAR-10 with ResNet18 for a specific normal class:
+```
+python main.py --dataset=cifar10 --label=n --backbone=18
+```
+Where n indicates the id of the normal class.
+
 To run experiments on different datasets, please set the path in utils.py to the desired dataset.
 
 ## Citation

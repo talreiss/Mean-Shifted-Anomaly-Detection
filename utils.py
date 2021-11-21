@@ -7,6 +7,8 @@ import torchvision.models as models
 import torch.nn.functional as F
 from PIL import ImageFilter
 import random
+from torchvision.transforms import InterpolationMode
+BICUBIC = InterpolationMode.BICUBIC
 
 class GaussianBlur(object):
     """Gaussian blur augmentation in SimCLR https://arxiv.org/abs/2002.05709"""
@@ -24,6 +26,13 @@ transform_color = transforms.Compose([transforms.Resize(256),
                                       transforms.CenterCrop(224),
                                       transforms.ToTensor(),
                                       transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+
+transform_resnet18 = transforms.Compose([
+    transforms.Resize(224, interpolation=BICUBIC),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
 
 
 moco_transform = transforms.Compose([
@@ -58,29 +67,34 @@ class Transform:
 
 
 class Model(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, backbone):
         super().__init__()
-        self.backbone = models.resnet152(pretrained=True)
+        if backbone == 152:
+            self.backbone = models.resnet152(pretrained=True)
+        else:
+            self.backbone = models.resnet18(pretrained=True)
         self.backbone.fc = torch.nn.Identity()
-        freeze_parameters(self.backbone, train_fc=False)
+        freeze_parameters(self.backbone, backbone, train_fc=False)
 
     def forward(self, x):
         z1 = self.backbone(x)
         z_n = F.normalize(z1, dim=-1)
         return z_n
 
-def freeze_parameters(model, train_fc=False):
-    for p in model.conv1.parameters():
-        p.requires_grad = False
-    for p in model.bn1.parameters():
-        p.requires_grad = False
-    for p in model.layer1.parameters():
-        p.requires_grad = False
-    for p in model.layer2.parameters():
-        p.requires_grad = False
+def freeze_parameters(model, backbone, train_fc=False):
     if not train_fc:
         for p in model.fc.parameters():
             p.requires_grad = False
+    if backbone == 152:
+        for p in model.conv1.parameters():
+            p.requires_grad = False
+        for p in model.bn1.parameters():
+            p.requires_grad = False
+        for p in model.layer1.parameters():
+            p.requires_grad = False
+        for p in model.layer2.parameters():
+            p.requires_grad = False
+
 
 
 def knn_score(train_set, test_set, n_neighbours=2):
@@ -93,10 +107,10 @@ def knn_score(train_set, test_set, n_neighbours=2):
     return np.sum(D, axis=1)
 
 
-def get_loaders(dataset, label_class, batch_size):
+def get_loaders(dataset, label_class, batch_size, backbone):
     if dataset == "cifar10":
         ds = torchvision.datasets.CIFAR10
-        transform = transform_color
+        transform = transform_color if backbone == 152 else transform_resnet18
         coarse = {}
         trainset = ds(root='data', train=True, download=True, transform=transform, **coarse)
         testset = ds(root='data', train=False, download=True, transform=transform, **coarse)
