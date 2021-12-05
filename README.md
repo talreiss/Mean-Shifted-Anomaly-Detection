@@ -23,6 +23,8 @@ python main.py --dataset=cifar10 --label=n --backbone=18
 ```
 Where n indicates the id of the normal class.
 
+Use the ```--angular``` flag to jointly optimize the mean-shifted contrastive loss and the angular center loss.  
+
 To run experiments on different datasets, please set the path in utils.py to the desired dataset.
 
 ## Citation

@@ -34,16 +34,17 @@ def train_model(model, train_loader, test_loader, train_loader_1, device, args):
     print('Epoch: {}, AUROC is: {}'.format(0, auc))
     optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=0.00005)
     center = torch.FloatTensor(feature_space).mean(dim=0)
-    center = F.normalize(center, dim=-1)
+    if args.angular:
+        center = F.normalize(center, dim=-1)
     center = center.to(device)
     for epoch in range(args.epochs):
-        running_loss = run_epoch(model, train_loader_1, optimizer, center, device)
+        running_loss = run_epoch(model, train_loader_1, optimizer, center, device, arg.angular)
         print('Epoch: {}, Loss: {}'.format(epoch + 1, running_loss))
         auc, _ = get_score(model, device, train_loader, test_loader)
         print('Epoch: {}, AUROC is: {}'.format(epoch + 1, auc))
 
 
-def run_epoch(model, train_loader, optimizer, center, device):
+def run_epoch(model, train_loader, optimizer, center, device, is_angular):
     total_loss, total_num = 0.0, 0
     for ((img1, img2), _) in tqdm(train_loader, desc='Train...'):
 
@@ -56,8 +57,10 @@ def run_epoch(model, train_loader, optimizer, center, device):
         out_1 = out_1 - center
         out_2 = out_2 - center
 
-        center_loss = ((out_1 ** 2).sum(dim=1).mean() + (out_2 ** 2).sum(dim=1).mean())
-        loss = contrastive_loss(out_1, out_2) + center_loss
+        loss = contrastive_loss(out_1, out_2)
+
+        if is_angular:
+            loss += ((out_1 ** 2).sum(dim=1).mean() + (out_2 ** 2).sum(dim=1).mean())
 
         loss.backward()
 
@@ -113,5 +116,6 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=1e-5, help='The initial learning rate.')
     parser.add_argument('--batch_size', default=64, type=int)
     parser.add_argument('--backbone', default=152, type=int, help='ResNet 18/152')
+    parser.add_argument('--angular', action='store_true', help='Train with angular center loss')
     args = parser.parse_args()
     main(args)
