@@ -38,7 +38,7 @@ def train_model(model, train_loader, test_loader, train_loader_1, device, args):
         center = F.normalize(center, dim=-1)
     center = center.to(device)
     for epoch in range(args.epochs):
-        running_loss = run_epoch(model, train_loader_1, optimizer, center, device, arg.angular)
+        running_loss = run_epoch(model, train_loader_1, optimizer, center, device, args.angular)
         print('Epoch: {}, Loss: {}'.format(epoch + 1, running_loss))
         auc, _ = get_score(model, device, train_loader, test_loader)
         print('Epoch: {}, AUROC is: {}'.format(epoch + 1, auc))
