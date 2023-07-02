@@ -35,10 +35,13 @@ See our new paper [**“Attribute-based Representations for Accurate and Interpr
 ## Citation
 If you find this useful, please cite our paper:
 ```
-@article{reiss2021mean,
-  title={Mean-Shifted Contrastive Loss for Anomaly Detection},
+@inproceedings{reiss2023mean,
+  title={Mean-shifted contrastive loss for anomaly detection},
   author={Reiss, Tal and Hoshen, Yedid},
-  journal={arXiv preprint arXiv:2106.03844},
-  year={2021}
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={37},
+  number={2},
+  pages={2155--2162},
+  year={2023}
 }
 ```
